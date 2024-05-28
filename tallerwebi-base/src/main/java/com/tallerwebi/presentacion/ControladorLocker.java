@@ -8,10 +8,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 
-
 @Controller
+@RequestMapping("/lockers")
 public class ControladorLocker {
 
     final ServicioLocker servicioLocker;
@@ -20,35 +21,30 @@ public class ControladorLocker {
         this.servicioLocker = servicioLocker;
     }
 
-
     @Transactional
-    @RequestMapping(path = "/crear-locker", method = RequestMethod.GET)
+    @GetMapping("/crear-locker")
     public ModelAndView crearLocker(@RequestParam("tipoLocker") TipoLocker tipoLocker) {
-        if (tipoLocker == null) {
-            throw new IllegalArgumentException("El tipo de locker no puede ser nulo.");
-        }
         List<Locker> lockers = servicioLocker.obtenerLockersPorTipo(tipoLocker);
         ModelAndView mav = new ModelAndView("crear-locker");
         mav.addObject("lockers", lockers);
         return mav;
     }
 
-
     @PostMapping("/actualizar-locker")
     public ModelAndView actualizarLocker(@RequestParam Long idLocker, @RequestParam TipoLocker tipoLocker) {
         servicioLocker.actualizarLocker(idLocker, tipoLocker);
-        return new ModelAndView("redirect:/actualizar-locker");
+        return new ModelAndView("redirect:/lockers/actualizar-locker");
     }
 
     @PostMapping("/eliminar-locker")
     public ModelAndView eliminarLocker(@RequestParam Long idLocker) {
         servicioLocker.eliminarLocker(idLocker);
-        return new ModelAndView("redirect:/mensaje-eliminacion-locker");
+        return new ModelAndView("redirect:/lockers/mensaje-eliminacion-locker");
     }
 
     @Transactional
-    @RequestMapping(path = "/lockers-por-tipo", method = RequestMethod.GET)
-    public ModelAndView buscarLockersPorTipo(TipoLocker tipoLocker) {
+    @GetMapping("/lockers-por-tipo")
+    public ModelAndView buscarLockersPorTipo(@RequestParam TipoLocker tipoLocker) {
         List<Locker> lockers = servicioLocker.obtenerLockersPorTipo(tipoLocker);
         ModelAndView mav = new ModelAndView("lockers-por-tipo");
         mav.addObject("lockers", lockers);
@@ -56,18 +52,27 @@ public class ControladorLocker {
     }
 
     @Transactional
-    @GetMapping("/lockers")
+    @GetMapping
     public ModelAndView mostrarLockers() {
         List<Locker> lockers = servicioLocker.obtenerLockersSeleccionados();
         return crearModelAndViewConCentro(lockers, "lockers");
     }
 
     @Transactional
-    @GetMapping("/lockers/search")
-    public ModelAndView buscarLockersPorCodigoPostal(@RequestParam("codigoPostal") String codigoPostal) {
-        List<Locker> lockers = servicioLocker.obtenerLockersPorCodigoPostal(codigoPostal);
+    @GetMapping("/search")
+    public ModelAndView buscarLockersPorCodigoPostal(
+            @RequestParam(value = "codigoPostal", required = false) String codigoPostal,
+            @RequestParam(value = "latitud", required = false) Double latitud,
+            @RequestParam(value = "longitud", required = false) Double longitud) {
+
+        List<Locker> lockers = servicioLocker.buscarLockers(codigoPostal, latitud, longitud, 5.0);
+        boolean mostrarAlternativos = lockers.isEmpty();
+
         ModelAndView mav = crearModelAndViewConCentro(lockers, "lockers");
         mav.addObject("codigoPostal", codigoPostal);
+        mav.addObject("latitud", latitud);
+        mav.addObject("longitud", longitud);
+        mav.addObject("mostrarAlternativos", mostrarAlternativos);
         return mav;
     }
 
@@ -86,16 +91,16 @@ public class ControladorLocker {
                 sumLongitud += locker.getLongitud();
             }
             center = new double[]{sumLatitud / lockers.size(), sumLongitud / lockers.size()};
-            zoom = 14; // Un nivel de zoom más cercano
+            zoom = 14;
         } else {
-            center = new double[]{-34.6821, -58.5638}; // Centro predeterminado si no hay lockers
-            zoom = 12; // Nivel de zoom predeterminado
+            center = new double[]{-34.6821, -58.5638}; // Centro predeterminado
+            zoom = 12;
         }
 
         mav.addObject("center", center);
         mav.addObject("zoom", zoom);
         return mav;
     }
-
-
 }
+
+

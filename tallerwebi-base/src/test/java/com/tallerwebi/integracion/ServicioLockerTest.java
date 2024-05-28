@@ -224,4 +224,49 @@ public class ServicioLockerTest {
         // Verificación
         assertTrue(resultado.isEmpty());
     }
+
+    @Test
+    public void obtenerLockersPorCodigoPostal_Exitoso() {
+        String codigoPostal = "1704";
+        List<Locker> lockers = Arrays.asList(new Locker(TipoLocker.PEQUEÑO, 40.7128, -74.0060, codigoPostal));
+
+        when(repositorioDatosLocker.obtenerLockersPorCodigoPostal(codigoPostal)).thenReturn(lockers);
+
+        List<Locker> resultado = servicioLocker.obtenerLockersPorCodigoPostal(codigoPostal);
+        assertEquals(lockers, resultado);
+    }
+
+    @Test
+    public void buscarLockers_PorCodigoPostal() {
+        String codigoPostal = "1704";
+        List<Locker> lockers = Arrays.asList(new Locker(TipoLocker.PEQUEÑO, 40.7128, -74.0060, codigoPostal));
+
+        when(servicioLocker.obtenerLockersPorCodigoPostal(codigoPostal)).thenReturn(lockers);
+
+        List<Locker> resultado = servicioLocker.buscarLockers(codigoPostal, null, null, null);
+        assertEquals(lockers, resultado);
+    }
+
+    @Test
+    public void buscarLockers_PorCoordenadas() {
+        Double latitud = 40.7128;
+        Double longitud = -74.0060;
+        Double radio = 5.0;
+        List<Locker> lockers = Arrays.asList(new Locker(TipoLocker.PEQUEÑO, latitud, longitud, "1704"));
+
+        when(servicioLocker.obtenerLockersCercanos(latitud, longitud, radio)).thenReturn(lockers);
+
+        List<Locker> resultado = servicioLocker.buscarLockers(null, latitud, longitud, radio);
+        assertEquals(lockers, resultado);
+    }
+
+    @Test
+    public void buscarLockers_SinParametrosUsaAlternativos() {
+        List<Locker> lockersSeleccionados = Arrays.asList(new Locker(TipoLocker.PEQUEÑO, 40.7128, -74.0060, "1704"));
+
+        when(servicioLocker.obtenerLockersSeleccionados()).thenReturn(lockersSeleccionados);
+
+        List<Locker> resultado = servicioLocker.buscarLockers(null, null, null, null);
+        assertEquals(lockersSeleccionados, resultado);
+    }
 }

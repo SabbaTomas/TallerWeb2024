@@ -44,44 +44,92 @@
         #filterForm button:hover {
             background-color: #0056b3;
         }
+        #filterForm .geolocation-button {
+            margin-top: 10px;
+        }
+        #container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px;
+        }
         #map {
             height: 500px;
-            width: 100%;
-            margin: 20px 0;
+            width: 70%;
+            margin-right: 20px;
         }
         .error-message {
             color: red;
             margin-top: 10px;
+        }
+        .alternatives {
+            width: 30%;
+            background-color: #ffffff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+        .alternatives p {
+            color: #d9534f;
+            font-weight: bold;
+        }
+        .alternatives ul {
+            list-style: none;
+            padding: 0;
+        }
+        .alternatives li {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .alternatives li:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
 <h1>Select a Locker</h1>
 <form id="filterForm" th:action="@{/lockers/search}" method="get">
-    <label for="codigoPostal">Ingrese su código postal (Ramos Mejía: 1704, San Justo: 1754):</label>
-    <input type="text" id="codigoPostal" name="codigoPostal" required>
+    <label for="codigoPostal">Ingrese su código postal:</label>
+    <input type="text" id="codigoPostal" name="codigoPostal">
     <button type="submit">Buscar Lockers</button>
-    <div id="errorMessage" class="error-message" style="display: none;">Código postal inválido. Solo se permiten Ramos Mejía (1704) y San Justo (1754).</div>
+    <button type="button" class="geolocation-button" onclick="obtenerUbicacion()">Usar mi ubicación actual</button>
+    <div id="errorMessage" class="error-message" style="display: none;">Código postal inválido.</div>
 </form>
-<div id="map"></div>
+<div id="container">
+    <div id="map"></div>
+    <div class="alternatives" th:if="${mostrarAlternativos}">
+        <p>No tenemos lockers cerca de ti, pero te ofrecemos estos lockers:</p>
+        <ul>
+            <li th:each="locker : ${lockers}" th:onclick="'centrarMapa(' + ${locker.latitud} + ',' + ${locker.longitud} + ')'" th:text="${locker.descripcion + ' - ' + locker.tipo + ' - ' + locker.codigo_postal}"></li>
+        </ul>
+    </div>
+</div>
 
 <script th:inline="javascript">
     /*<![CDATA[*/
     var lockers = /*[[${lockers}]]*/ [];
     var center = /*[[${center}]]*/ [-34.6821, -58.5638]; // Centro predeterminado
     var zoom = /*[[${zoom}]]*/ 12; // Nivel de zoom predeterminado
+    var mostrarAlternativos = /*[[${mostrarAlternativos}]]*/ false;
     /*]]>*/
 </script>
 
 <script>
+    var map;
+    var markers = [];
+    var currentInfoWindow = null;
+
     function initMap() {
         var mapCenter = {lat: center[0], lng: center[1]};
-        var map = new google.maps.Map(document.getElementById('map'), {
+        map = new google.maps.Map(document.getElementById('map'), {
             zoom: zoom,
             center: mapCenter
         });
-
-        var currentInfoWindow = null;
 
         lockers.forEach(function(locker) {
             var marker = new google.maps.Marker({
@@ -89,6 +137,7 @@
                 map: map,
                 title: locker.descripcion + ' - ' + locker.tipo
             });
+            markers.push(marker);
 
             var infoWindow = new google.maps.InfoWindow({
                 content: `<h3>${locker.descripcion}</h3>
@@ -101,14 +150,30 @@
                 if (currentInfoWindow) {
                     currentInfoWindow.close();
                 }
-                if (currentInfoWindow !== infoWindow) {
-                    infoWindow.open(map, marker);
-                    currentInfoWindow = infoWindow;
-                } else {
-                    currentInfoWindow = null;
-                }
+                infoWindow.open(map, marker);
+                currentInfoWindow = infoWindow;
             });
         });
+    }
+
+    function obtenerUbicacion() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var lat = position.coords.latitude;
+                var lon = position.coords.longitude;
+                window.location.href = `/spring/lockers/search?latitud=${lat}&longitud=${lon}`;
+            }, function(error) {
+                alert("Error al obtener la ubicación: " + error.message);
+            });
+        } else {
+            alert("Geolocalización no soportada por este navegador.");
+        }
+    }
+
+    function centrarMapa(lat, lon) {
+        var position = {lat: lat, lng: lon};
+        map.setCenter(position);
+        map.setZoom(15);
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -117,16 +182,6 @@
         script.async = true;
         script.defer = true;
         document.head.appendChild(script);
-
-        document.getElementById('filterForm').addEventListener('submit', function(event) {
-            var codigoPostal = document.getElementById('codigoPostal').value;
-            if (codigoPostal !== '1704' && codigoPostal !== '1754') {
-                event.preventDefault();
-                document.getElementById('errorMessage').style.display = 'block';
-            } else {
-                document.getElementById('errorMessage').style.display = 'none';
-            }
-        });
     });
 </script>
 </body>

@@ -19,4 +19,7 @@ public interface ServicioLocker {
     List<Locker> obtenerLockersSeleccionados();
 
     List<Locker> obtenerLockersPorCodigoPostal(String codigoPostal);
+
+    List<Locker> obtenerLockersCercanos(double latitud, double longitud, double radio);
+    public List<Locker> buscarLockers(String codigoPostal, Double latitud, Double longitud, Double radio);
 }

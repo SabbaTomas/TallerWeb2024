@@ -37,12 +37,11 @@ public class ServicioLockerImpl implements ServicioLocker {
         Locker locker = lockerRepository.obtenerPorId(idLocker);
         if (locker != null) {
             locker.setTipo(tipoLocker);
-            lockerRepository.guardar(locker);
+            lockerRepository.actualizar(locker);
         } else {
             throw new IllegalArgumentException("No se encontró ningún locker con el ID proporcionado: " + idLocker);
         }
     }
-
 
     @Override
     public void eliminarLocker(Long idLocker) {
@@ -82,5 +81,32 @@ public class ServicioLockerImpl implements ServicioLocker {
     @Transactional
     public void eliminarTodos() {
         lockerRepository.eliminarTodos();
+    }
+
+    public List<Locker> obtenerLockersCercanos(double latitud, double longitud, double radio) {
+        double rangoLat = radio / 111.0;
+        double rangoLon = radio / (111.0 * Math.cos(Math.toRadians(latitud)));
+        return lockerRepository.obtenerLockersPorRangoDeCoordenadas(latitud - rangoLat, latitud + rangoLat, longitud - rangoLon, longitud + rangoLon);
+    }
+
+    @Transactional
+    public List<Locker> buscarLockers(String codigoPostal, Double latitud, Double longitud, Double radio) {
+        List<Locker> lockers;
+        boolean mostrarAlternativos = false;
+
+        if (codigoPostal != null && !codigoPostal.isEmpty()) {
+            lockers = obtenerLockersPorCodigoPostal(codigoPostal);
+        } else if (latitud != null && longitud != null && radio != null) {
+            lockers = obtenerLockersCercanos(latitud, longitud, radio);
+        } else {
+            lockers = obtenerLockersSeleccionados();
+        }
+
+        if (lockers == null || lockers.isEmpty()) {
+            lockers = obtenerLockersSeleccionados();
+            mostrarAlternativos = true;
+        }
+
+        return lockers;
     }
 }

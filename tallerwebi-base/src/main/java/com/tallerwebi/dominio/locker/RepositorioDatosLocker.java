@@ -23,4 +23,6 @@ public interface RepositorioDatosLocker  {
     void eliminarTodos();
 
     List<Locker> obtenerLockersPorCodigoPostal(String codigoPostal);
+
+    List<Locker> obtenerLockersPorRangoDeCoordenadas(double v, double v1, double v2, double v3);
 }

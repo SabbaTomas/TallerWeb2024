@@ -25,7 +25,7 @@ public class Locker {
     }
 
     // Constructor con tipo, latitud y longitud
-    public Locker(TipoLocker tipo, double latitud, double longitud, String codigo_postal) {
+    public Locker(TipoLocker tipo, Double latitud, Double longitud, String codigo_postal) {
         this.tipo = tipo;
         this.latitud = latitud;
         this.longitud = longitud;
