@@ -16,6 +16,14 @@ public class Usuario {
     private String rol;
     private Boolean activo = false;
 
+    public Usuario(Long idUsuario) {
+        this.id = idUsuario;
+    }
+
+    public Usuario() {
+
+    }
+
     public Long getId() {
         return id;
     }

@@ -36,7 +36,6 @@ public class RepositorioLockerTest {
         this.repolocker = new RepositorioDatosLockerImpl(this.sessionFactory);
     }
 
-    // Pruebas adicionales
 
     @Test
     @Rollback

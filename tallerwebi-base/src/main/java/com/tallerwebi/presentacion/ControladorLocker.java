@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@RequestMapping("/lockers")
+@RequestMapping("/mapa")
 public class ControladorLocker {
 
     final ServicioLocker servicioLocker;
@@ -33,13 +33,13 @@ public class ControladorLocker {
     @PostMapping("/actualizar-locker")
     public ModelAndView actualizarLocker(@RequestParam Long idLocker, @RequestParam TipoLocker tipoLocker) {
         servicioLocker.actualizarLocker(idLocker, tipoLocker);
-        return new ModelAndView("redirect:/lockers/actualizar-locker");
+        return new ModelAndView("actualizar-locker");
     }
 
     @PostMapping("/eliminar-locker")
     public ModelAndView eliminarLocker(@RequestParam Long idLocker) {
         servicioLocker.eliminarLocker(idLocker);
-        return new ModelAndView("redirect:/lockers/mensaje-eliminacion-locker");
+        return new ModelAndView("eliminar-locker");
     }
 
     @Transactional
@@ -66,7 +66,12 @@ public class ControladorLocker {
             @RequestParam(value = "longitud", required = false) Double longitud) {
 
         List<Locker> lockers = servicioLocker.buscarLockers(codigoPostal, latitud, longitud, 5.0);
-        boolean mostrarAlternativos = lockers.isEmpty();
+        boolean mostrarAlternativos = false;
+
+        if (lockers.isEmpty()) {
+            lockers = servicioLocker.obtenerLockersSeleccionados();
+            mostrarAlternativos = true;
+        }
 
         ModelAndView mav = crearModelAndViewConCentro(lockers, "lockers");
         mav.addObject("codigoPostal", codigoPostal);

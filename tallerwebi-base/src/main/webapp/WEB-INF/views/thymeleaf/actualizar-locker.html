@@ -1,14 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Mensaje de actualización de locker</title>
-    <link rel="stylesheet" type="text/css">
-    <link rel="stylesheet" th:href="@{/css/main.css}"/>
-
+    <title>Actualizar Locker</title>
 </head>
 <body>
-<h1>¡Locker actualizado exitosamente!</h1>
-<p>El locker ha sido actualizado correctamente.</p>
+<form action="/lockers/actualizar-locker" method="post">
+    <input type="hidden" name="idLocker" value="1">
+    <label for="tipoLocker">Tipo de Locker:</label>
+    <select name="tipoLocker" id="tipoLocker">
+        <option value="PEQUEÑO">Pequeño</option>
+        <option value="MEDIANO">Mediano</option>
+        <option value="GRANDE">Grande</option>
+    </select>
+    <button type="submit">Actualizar Locker</button>
+</form>
 </body>
 </html>

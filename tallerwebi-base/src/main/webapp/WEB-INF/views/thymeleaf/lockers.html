@@ -105,10 +105,13 @@
     <div class="alternatives" th:if="${mostrarAlternativos}">
         <p>No tenemos lockers cerca de ti, pero te ofrecemos estos lockers:</p>
         <ul>
-            <li th:each="locker : ${lockers}" th:onclick="'centrarMapa(' + ${locker.latitud} + ',' + ${locker.longitud} + ')'" th:text="${locker.descripcion + ' - ' + locker.tipo + ' - ' + locker.codigo_postal}"></li>
+            <li th:each="locker : ${lockers}"
+                th:onclick="'centrarMapa(' + ${locker.latitud} + ',' + ${locker.longitud} + ')'"
+                th:text="${locker.descripcion + ' - ' + locker.tipo + ' - ' + locker.codigo_postal}"></li>
         </ul>
     </div>
 </div>
+
 
 <script th:inline="javascript">
     /*<![CDATA[*/

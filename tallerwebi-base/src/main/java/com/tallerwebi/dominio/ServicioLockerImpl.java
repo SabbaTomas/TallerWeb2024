@@ -66,6 +66,7 @@ public class ServicioLockerImpl implements ServicioLocker {
         return lockerRepository.obtenerPorId(idLocker);
     }
 
+    @Transactional
     public List<Locker> obtenerLockersPorCodigoPostal(String codigoPostal) {
         if (codigoPostal == null || codigoPostal.isEmpty()) {
             throw new IllegalArgumentException("Código postal no puede ser nulo o vacío");
@@ -92,7 +93,6 @@ public class ServicioLockerImpl implements ServicioLocker {
     @Transactional
     public List<Locker> buscarLockers(String codigoPostal, Double latitud, Double longitud, Double radio) {
         List<Locker> lockers;
-        boolean mostrarAlternativos = false;
 
         if (codigoPostal != null && !codigoPostal.isEmpty()) {
             lockers = obtenerLockersPorCodigoPostal(codigoPostal);
@@ -103,10 +103,11 @@ public class ServicioLockerImpl implements ServicioLocker {
         }
 
         if (lockers == null || lockers.isEmpty()) {
-            lockers = obtenerLockersSeleccionados();
-            mostrarAlternativos = true;
+            lockers = new ArrayList<>();
         }
 
         return lockers;
     }
+
+
 }

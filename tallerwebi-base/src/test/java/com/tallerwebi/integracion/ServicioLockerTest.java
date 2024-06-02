@@ -52,9 +52,11 @@ public class ServicioLockerTest {
         servicioLocker.actualizarLocker(idLocker, nuevoTipo);
 
         // Verificación
-        verify(repositorioDatosLocker, times(1)).guardar(locker);
+        verify(repositorioDatosLocker, times(1)).actualizar(locker);
         assertEquals(nuevoTipo, locker.getTipo());
     }
+
+
 
     @Test
     public void queNoSePuedaActualizarLockerConIdInvalido() {

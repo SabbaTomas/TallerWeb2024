@@ -74,6 +74,7 @@ public class RepositorioDatosLockerImpl implements RepositorioDatosLocker {
                 .list();
     }
 
+
     @Override
     public List<Locker> obtenerLockersPorRangoDeCoordenadas(double latMin, double latMax, double lonMin, double lonMax) {
         String hql = "FROM Locker WHERE latitud BETWEEN :latMin AND :latMax AND longitud BETWEEN :lonMin AND :lonMax";
@@ -85,3 +86,27 @@ public class RepositorioDatosLockerImpl implements RepositorioDatosLocker {
                 .getResultList();
     }
 }
+/*
+$places = Places::where([
+        ['visible', '=', '1'],
+        ['deleted', '=', '0'],
+        ])->select(['id',
+        'name',
+        'description',
+        'latitude',
+        'longitude',
+        'deleted',
+        DB::raw('concat("' . env('APP_URL') . '", avatar_url) as avatarUrl'),
+        'user_id as userId',
+        'visible',
+        'address',
+        DB::raw('(6351 * acos( cos( radians(' . $latitude . ') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(' . $langitude . ') ) + sin( radians(' . $latitude . ') ) * sin(radians(latitude)) ) ) AS distance')
+        ])
+        ->orderBy('distance')
+        ->havingRaw('distance < ' . env("PLACES_SEARCH_DISTANCE"))
+        ->take(env("LIMIT_SEARCH_DISTANCE"))
+        ->get()
+        ->toArray();
+
+
+ */
