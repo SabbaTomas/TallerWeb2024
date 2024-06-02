@@ -4,7 +4,7 @@ Proyecto base Taller Web I (Maven and Thymeleaf)
 ## 1. Como iniciar el proyecto
 ```shell
 $ mvn clean jetty:run
-# http://localhost:8080/spring
+# http://localhost:8080/lockers
 ```
 ## 2. Thymeleaf
 * [Documentacion](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html)
